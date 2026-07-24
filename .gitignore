@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.mypy_cache/
+.venv/
+data/output/
+llm_sdk.zip
+.env
+*.egg-info/
