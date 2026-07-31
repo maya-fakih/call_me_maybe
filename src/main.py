@@ -1,7 +1,9 @@
 import sys
 import argparse
+import json
+from typing import Any
 
-def input_validation():
+def input_validation() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--functions_definition",
@@ -17,12 +19,20 @@ def input_validation():
     )
     return parser.parse_args()
 
-
+def json_loader(args: argparse.Namespace) -> list[dict[str, Any]]:
+    with open(args.functions_definition) as f:
+        return json.load(f)
 
 def main():
-    args = input_validation()
+    args: argparse.Namespace = input_validation()
     for name, value in vars(args).items():
         print (name, value)
+    try:
+        functions = json_loader(args)
+    except Exception as e:
+        print(e)
+        exit(1)
+
 
 if __name__== '__main__':
     main()
