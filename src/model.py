@@ -36,6 +36,10 @@ class Model:
             variables in the prompt.
         """
 
+    def generate_response(self, prompt: str) -> str:
+        pass
+
     def generate_json(output_file: str) -> None:
         with open(output_file) as out:
-            
+            for prompt in self.prompts:
+                pass
