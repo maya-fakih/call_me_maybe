@@ -19,16 +19,17 @@ def input_validation() -> argparse.Namespace:
     )
     return parser.parse_args()
 
-def json_loader(args: argparse.Namespace) -> list[dict[str, Any]]:
-    with open(args.functions_definition) as f:
+def json_loader(arg: str) -> list[dict[str, Any]]:
+    with open(arg) as f:
         return json.load(f)
 
-def main():
+def main() -> None:
     args: argparse.Namespace = input_validation()
     for name, value in vars(args).items():
         print (name, value)
     try:
-        functions = json_loader(args)
+        functions = json_loader(args.functions_definition)
+        prompts = json_loader(args.input)
     except Exception as e:
         print(e)
         exit(1)
