@@ -30,10 +30,11 @@ def main() -> None:
     try:
         functions = json_loader(args.functions_definition)
         prompts = json_loader(args.input)
+        llm = Small_LLM_Model()
+        caller = Model(llm, functions, prompts)
     except Exception as e:
         print(e)
         exit(1)
-
 
 if __name__== '__main__':
     main()
