@@ -12,3 +12,7 @@ class Model:
         self.model = model
         self.functions = functions
         self.prompts = prompts
+
+    def generate_json(output_file: str) -> None:
+        with open(output_file) as out:
+            

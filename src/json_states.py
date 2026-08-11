@@ -11,3 +11,4 @@ class JsonStates(enum.Enum):
     PARAMETERS = 8           # "parameters": {...} -> call find_parameters()
     CLOSE_PARENTHESIS = 9     # }
     NEXT = 10                 # ,
+    END = 11                  # ]
