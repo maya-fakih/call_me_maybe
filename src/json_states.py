@@ -1,14 +1,13 @@
 import enum
 
 class JsonStates(enum.Enum):
-    BracketOpen = 1 #[
-    BracesOpen = 2  #{
-    PromptKey = 3   #"prompt": 
-    PromptString = 4
-    Comma = 5
-    Name = 6        #"name": "
-    #get logits from model to predict function name
-    CloseQuotes = 7 #"
-    Prameters = 8   #"parameters": {<get these from the functions file you already have the name>}
-    CloseParanthesis = 9 #}
-    Next = 10       #,
+    BRACKET_OPEN = 1        # [
+    BRACES_OPEN = 2         # {
+    PROMPT_KEY = 3          # "prompt":
+    PROMPT_STRING = 4       # copy the original prompt, no model call
+    COMMA = 5
+    NAME = 6                 # "name": " -> model picks via masking
+    CLOSE_QUOTES = 7          # "
+    PARAMETERS = 8           # "parameters": {...} -> call find_parameters()
+    CLOSE_PARENTHESIS = 9     # }
+    NEXT = 10                 # ,
