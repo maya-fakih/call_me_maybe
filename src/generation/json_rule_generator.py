@@ -78,7 +78,7 @@ class JSONRuleGenerator(RuleGenerator):
         if isinstance(value, dict):
             parts = []
             for key, sub_value in value.items():
-                sub_ref = self._infer_shape(sub_value, f"{name}_{key}", rules)
+                sub_ref = self._infer_shape(sub_value, key, rules)
                 parts.append(f'"\\"{key}\\"" WS ":" WS {sub_ref}')
             body = ' WS "," WS '.join(parts)
             rules[name] = f'"{{" WS {body} WS "}}"'
