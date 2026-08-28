@@ -1,0 +1,23 @@
+# Generic JSON grammar.
+#
+# := defines a rule | alternation ? optional * zero-or-more + one-or-more
+# () grouping "..." literal ANYCHAR any single char  A - B  A but not B
+
+# WS = white spaces.... just looks neater in code
+WS      := (" " | "\t" | "\n" | "\r")*
+
+digit   := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+integer := "-"? ("0" | ([1-9] digit*))
+float   := "-"? ("0" | ([1-9] digit*)) "." digit+
+boolean := "true" | "false"
+null    := "null"
+
+escape  := "\\" ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+char    := escape | (ANYCHAR - "\"" - "\\")
+string  := "\"" char* "\""
+
+value   := object | array | string | float | integer | boolean | null
+member  := string WS ":" WS value
+
+object  := "{" WS (member (WS "," WS member)*)? WS "}"
+array   := "[" WS (value (WS "," WS value)*)? WS "]"
