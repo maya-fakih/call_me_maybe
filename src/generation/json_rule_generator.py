@@ -33,14 +33,6 @@ class JSONRuleGenerator(RuleGenerator):
         """
         try:
             with open(output_path, "a") as output_file:
-                # collect context from input data
-                # only check what are the available keys and for each key put all the available options in a set but start from the leafs and work back rules
-                # start from the leafs of the dict for all the similar keys at the leaf level collect that like here we have name: all the possible names a rule
-                # then work it up as 2nd level we have an answer has name and parameters but dont specify all examples just set rule we might need it
-                # then work it up we have the list of functions and we have have a rule for that as well though that is checking format which we will do for the output
-                # to learn format not for input where we only want to learn the vocabulary and the rules for them
-                # write the rules to the output file
-
                 output_file.write("# Input Rules\n")
                 # how to get the depth of a json so we can start from the leafs it has to be generic we need to find the leafs keys
                 leaf_keys = self.find_leaf_keys(data)
@@ -51,6 +43,57 @@ class JSONRuleGenerator(RuleGenerator):
 
         except Exception as e:
             print(f"Error generating input rules: {e}")
+
+    def _generate_output_rules(self, data: list[dict], output_path: str) -> None:
+        """
+        data looks like output_shape.json: a list with one (or more) example
+        answer objects. Leaf values here are placeholders -> we only care
+        about their type, never their actual value.
+
+        Builds rules bottom-up: recurse to the leaves first, they resolve
+        to a type name immediately (string/float/integer/boolean). Every
+        nested dict resolves only after its own children are done, then
+        registers its own rule and hands its name back up to its parent.
+        """
+        try:
+            example = data[0]
+            rules: dict[str, str] = {}
+            self._infer_shape(example, "answer", rules)
+
+            with open(output_path, "a") as output_file:
+                output_file.write("# Output Rules\n")
+                for name, body in rules.items():
+                    output_file.write(f"{name} := {body}\n")
+
+        except Exception as e:
+            print(f"Error generating output rules: {e}")
+
+    def _infer_shape(self, value, name: str, rules: dict) -> str:
+        """Recursively resolve value's shape, deepest first.
+
+        Returns the rule name to reference `value` by. Dicts register
+        their own rule in `rules` as a side effect before returning
+        their name; leaves just return a type name directly.
+        """
+        if isinstance(value, dict):
+            parts = []
+            for key, sub_value in value.items():
+                sub_ref = self._infer_shape(sub_value, f"{name}_{key}", rules)
+                parts.append(f'"\\"{key}\\"" WS ":" WS {sub_ref}')
+            body = ' WS "," WS '.join(parts)
+            rules[name] = f'"{{" WS {body} WS "}}"'
+            return name
+
+        if isinstance(value, bool):
+            return "boolean"
+        if isinstance(value, str):
+            return "string"
+        if isinstance(value, float):
+            return "float"
+        if isinstance(value, int):
+            return "integer"
+
+        raise ValueError(f"Unsupported leaf type: {value!r}")
 
     def find_leaf_keys(self, data: dict, parent_key: str = '') -> set:
         """Recursively find all leaf_keys in a nested dict."""
