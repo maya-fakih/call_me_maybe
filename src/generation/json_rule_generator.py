@@ -67,15 +67,15 @@ class JSONRuleGenerator(RuleGenerator):
                 leaf_keys.update(self.find_leaf_keys(item, parent_key))
         return leaf_keys
 
-    def collect_vocab(self, data: dict, key: str) -> set:
-        """Collect all unique values for a given key in a nested dict."""
+    def collect_vocab(self, data, key: str) -> set:
         vocab = set()
         if isinstance(data, dict):
-            for value in data.values():
-                vocab.update(self.collect_vocab(value, key))
+            for k, value in data.items():
+                if k == key:
+                    vocab.add(value)
+                else:
+                    vocab.update(self.collect_vocab(value, key))
         elif isinstance(data, list):
             for item in data:
                 vocab.update(self.collect_vocab(item, key))
-        else:
-            vocab.add(data)
         return vocab
