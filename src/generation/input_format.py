@@ -3,7 +3,7 @@ from typing import Literal
 
 AllowedType = Literal["string", "number", "boolean", "integer"]
 
-class InputFormat(pydantic.BaseModel):
+class FunctionDefinition(pydantic.BaseModel):
     name: str
     description: str
     parameters: dict[str, dict[str, AllowedType]]
