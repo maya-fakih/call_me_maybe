@@ -1,5 +1,7 @@
 import json
 from generation.rule_generator import RuleGenerator
+from pydantic import TypeAdapter
+from generation.input_format import FunctionDefinition
 
 
 class JSONRuleGenerator(RuleGenerator):
@@ -14,9 +16,9 @@ class JSONRuleGenerator(RuleGenerator):
 
     def generate_input_rules(self, input_path: str, output_path: str) -> None:
         try:
-            with open(input_path, 'r', encoding="utf-8") as f:
+            with open(input_path, "r") as f:
                 data = json.load(f)
-                # assuming data is a list of input formats which is so based on the subject
-                
+            functions = TypeAdapter(list[FunctionDefinition]).validate_python(data)
+            name_rule = "name := " + " | ".join(f'"\\"{fn.name}\\""' for fn in functions)        
         except Exception as e:
             raise RuntimeError(f"Failed to read input file: {e}")
