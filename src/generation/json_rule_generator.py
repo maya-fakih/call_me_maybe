@@ -28,7 +28,7 @@ class JSONRuleGenerator(RuleGenerator):
             functions = TypeAdapter(list[FunctionDefinition]).validate_python(data)
 
             call_rule_names = []
-            lines = ["# Input Rules"]
+            lines = ["# Input Rules", self._primitive_rules()]
             for fn in functions:
                 lines.append(self._build_params_rule(fn))
                 lines.append(self._build_call_rule(fn))
@@ -40,6 +40,21 @@ class JSONRuleGenerator(RuleGenerator):
                 out.write("\n".join(lines) + "\n")
         except Exception as e:
             raise RuntimeError(f"Failed to generate input rules: {e}")
+
+    def _primitive_rules(self) -> str:
+        """Leaf-level rules referenced by TYPE_TO_RULE (integer/float/boolean/string)
+        and their own dependencies (WS, digit, escape, char). Emitted once per run,
+        before any per-function rules, so every Reference to them resolves."""
+        return "\n".join([
+            'WS      := (" " | "\\t" | "\\n" | "\\r")*',
+            'digit   := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"',
+            'integer := "-"? ("0" | ([1-9] digit*))',
+            'float   := "-"? ("0" | ([1-9] digit*)) "." digit+',
+            'boolean := "true" | "false"',
+            'escape  := "\\\\" ("\\"" | "\\\\" | "/" | "b" | "f" | "n" | "r" | "t")',
+            'char    := escape | (ANYCHAR - "\\"" - "\\\\")',
+            'string  := "\\"" char* "\\""',
+        ])
 
     def _build_params_rule(self, fn: FunctionDefinition) -> str:
         members = []
