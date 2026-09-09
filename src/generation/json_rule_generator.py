@@ -48,8 +48,8 @@ class JSONRuleGenerator(RuleGenerator):
         return "\n".join([
             'WS      := (" " | "\\t" | "\\n" | "\\r")*',
             'digit   := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"',
-            'integer := "-"? ("0" | ((digit - "0") digit*))'
-            'float   := "-"? ("0" | ((digit - "0") digit*)) "." digit+'
+            'integer := "-"? ("0" | ((digit - "0") digit*))',
+            'float   := "-"? ("0" | ((digit - "0") digit*)) "." digit+',
             'boolean := "true" | "false"',
             'escape  := "\\\\" ("\\"" | "\\\\" | "/" | "b" | "f" | "n" | "r" | "t")',
             'char    := escape | (ANYCHAR - "\\"" - "\\\\")',
